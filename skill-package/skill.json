@@ -1,0 +1,46 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Control your JMRI connected throttle, turnouts, and more using Alexa.",
+          "examplePhrases": [
+            "Alexa, ask my train set how many trains I have",
+            "Alexa, ask my train set to turn [on|off] the power",
+            "Alexa, ask my train set to set the speed to 30 percent"
+          ],
+          "keywords": [
+            "jmri",
+            "dcc",
+            "trains"
+          ],
+          "name": "my train set",
+          "description": "Control your JMRI connected locos, turnouts, and more using Alexa, just say: alexa, ask my train set if the train is on.",
+          "smallIconUri": "https://alexa-mytrainset.s3.amazonaws.com/icon_108_A2Z.png",
+          "largeIconUri": "https://alexa-mytrainset.s3.amazonaws.com/icon_512_A2Z.png"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "No special instructions.",
+      "category": "EDUCATION_AND_REFERENCE",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {}
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "en-US": {
+          "termsOfUseUrl": "",
+          "privacyPolicyUrl": ""
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
+  }
+}

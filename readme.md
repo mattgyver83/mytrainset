@@ -14,6 +14,7 @@ This skill provides the following features, see usage for example phrases
 3.  Set throttle speed (multi-address support)
 4.  Set direction (multi-address support)
 5.  Rewind (invert direction for duration, set throttle to 0 and reset direction)
+6.  Turnout Control by User Name (JMRI Turnout User Name can't include the word Turnout/Turn out)
 
 The default behavior of the skill is to command the first car in your JMRI roster when its not been invoked to target a specific DCC address.  When a specific DCC addresses is requested the skill will lookup the car in the JMRI roster and then send the command instead to the requested address.
 
@@ -23,7 +24,7 @@ The most straight forward way to install this skill is using the Alexa Skills Ki
 
 ### Obtain the skill template
 
-    ask new --url <git clone address>
+    ask new --url <git clone address.git>
 
 ### Skill preparation & configuration
 Configuration requires the following steps
@@ -37,10 +38,13 @@ Configuration requires the following steps
     cd </path/to/skill/template/root/>
     ask deploy
 
-**Upon completion use either the Alexa website or Alexa app to enable your custom skill**
+**Upon completion use either the Alexa website or Alexa app to verify your custom skill has been enabled**
 
 ### Using this skill:
 The following example phrases have been provided to illustrate how you may communicate with the skill.  Most features support multi-address context.
+
+Start your request by saying, "Alexa, ask my train set ..."
+
 
 #### Throttle Control (single and multi-address)  
 set the speed to 100 percent  
@@ -156,4 +160,10 @@ what trains do i have
 what does my train roster look like  
 what are my train addresses  
 whats in my train roster  
-whats in my roster  
+whats in my roster
+
+#### Turnout Control
+to close the station turn out
+to throw the station turn out
+to close the inner loop turn out
+to throw the inner loop turn out

@@ -86,6 +86,70 @@ const GetRosterDataHandler = {
   },
 };
 
+const GetTurnoutDataHandler = {
+// Retrieve Turnout information from JMRI
+
+  canHandle(handlerInput){
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'GetTurnoutDataIntent';
+  },
+  async handle(handlerInput) {
+    // set some default speach and card information specifically in case nothing is in the Turnout
+    let outputSpeech = "There are no turnouts setup in JMRI";
+    let cardTitle = 'Your Turnouts';
+    let cardText = "There are no turnouts";
+
+    // request the Turnout Information from the JMRI JSON server
+    await getRemoteData(jmriProtocol + "://" + jmriHostname + ":" + jmriPort + jmriPathname + "turnout")
+    .then((response) => {
+        //process the response
+        const data = JSON.parse(response);
+
+        // when more than one turnout build the output for each item
+        if (data.length >= 1) {
+          outputSpeech = `JMRI manages ${data.length} turnout`;
+          cardText = "Turnout Names: \n";
+
+          // setup a loop to process the Turnout
+          for (let i = 0; i < data.length; i++) {
+
+            if (i === 0) {
+              // process the first record returned
+		if (data.length === 1) {
+		    // if we only have one item lets address it specifically
+		    outputSpeech = outputSpeech + ". It's name is: " + data[i].data.userName;
+		    cardText = cardText + data[i].data.userName;
+		} else {
+		    // if we have more than one item lets address them together
+		    outputSpeech = outputSpeech + "'s. Their names are: " + data[i].data.userName + ', ';
+		    cardText = cardText + data[i].data.userName + ', ';
+		}	
+	    } else if (i === data.length - 1) {
+              //if this is the last record lets throw 'and' before it
+                outputSpeech = outputSpeech + 'and ' + data[i].data.userName + '.';
+                cardText = cardText + 'and ' + data[i].data.userName + '.';
+            } else {
+                //comma separate middle records
+                outputSpeech = outputSpeech + data[i].data.userName + ', ';
+                cardText = cardText + data[i].data.userName + ', ';
+            }
+         }
+       }
+    })
+
+      .catch((err) => {
+        //set an optional error message here
+        //outputSpeech = err.message;
+      });
+
+    return handlerInput.responseBuilder
+      .speak(outputSpeech)
+      .withSimpleCard(cardTitle, cardText)
+      .getResponse();
+
+  },
+};
+
 const GetPowerDataHandler = {
 // Return the state of the power
   canHandle(handlerInput) {
@@ -152,6 +216,47 @@ const RestPowerIntentHandler = {
     } else {
       //Unknown
       outputSpeech = "I can't do that right now, something went wrong."
+    }
+
+    return handlerInput.responseBuilder
+      .speak(outputSpeech)
+      .getResponse();
+  },
+};
+
+const RestTurnoutIntentHandler = {
+  // Send a REST call to modify the current turnout state
+
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'RestTurnoutIntent';
+  },
+
+  async handle(handlerInput) {
+    // capture the turnout state requested by the user
+    let turnoutStateRequested = handlerInput.requestEnvelope.request.intent.slots.turnoutSlot.value;
+    let turnoutRequested = handlerInput.requestEnvelope.request.intent.slots.turnoutQueryQualifier.value;
+
+    await lookupTurnout(turnoutRequested)
+
+    if (lookupErrorReturned !== true) { 
+
+       if (turnoutStateRequested == "off" || turnoutStateRequested == "close") {
+         //Send JSON request to close the turnout
+         putRemoteData(jmriHostname, jmriPathname + "turnout" + "/" + jmriTurnoutUserName, jmriPort, { state: 2 })
+         outputSpeech = "I've closed the " + turnoutRequested + " turnout"
+
+       } else if (turnoutStateRequested == "on" || turnoutStateRequested == "throw") {
+         //Send JSON reqeust to throw the turnout
+         putRemoteData(jmriHostname, jmriPathname + "turnout" + "/" + jmriTurnoutUserName, jmriPort, { state: 4 })
+         outputSpeech = "I've thrown the " + turnoutRequested + " turnout"
+       }
+
+    } else {
+	outputSpeech = "The requested turnout, " + turnoutRequested + ", cannot be found in JMRI"
+        cardTitle = "Error"
+	cardText = "The requested turnout, " + turnoutRequested + ", cannot be found in JMRI"
+	lookupErrorReturned = false 
     }
 
     return handlerInput.responseBuilder
@@ -583,7 +688,7 @@ const lookupLocoInfo = async function (locoLookupAddress) {
 			lookupErrorReturned = true
 			console.log("No Match, lookupErrorReturned: " + lookupErrorReturned)
 		    } else { 
-			// there is no match, set a special bool for later use to inform the user
+			// there is no error matching (match was found), set a special bool for later use to inform the user
 			jmriLocoID = rosterEntries[i].data.name
 			jmriLocoAddress = rosterEntries[i].data.address
 			lookupErrorReturned = false
@@ -601,13 +706,76 @@ const lookupLocoInfo = async function (locoLookupAddress) {
     });
 }
 
+const lookupTurnout = async function (turnoutLookupUserName) {
+// perform a lookup in the turnout table to determine if there is a valid turnout based on userName
+
+    await getRemoteData(jmriProtocol + "://" + jmriHostname + ":" + jmriPort + jmriPathname + "turnout")
+    .then((response) => {
+	var turnoutEntries = JSON.parse(response);
+	console.log("Here is what was returned: " + turnoutEntries)
+	// make sure there are turnouts in the table
+	if (turnoutEntries.length === 0) {
+	    // there are no turnouts so set an error boolean
+	    lookupErrorReturned = true
+	    console.log("There are no turnouts in the table, quit.")
+	} else {
+	    if (typeof turnoutLookupUserName === 'undefined') {
+                // BETA: This is not fully implemented yet - it may become overcome by events and removed in a future version
+                //       If a turnout name is not given capture the first turnout in the table
+                //       Currently *.data.name is not used but left for a potential future use case
+		jmriTurnoutAddress = turnoutEntries[0].data.name
+		jmriTurnoutUserName = turnoutEntries[0].data.userName.replace(/\s+/g, '%20')
+		console.log("turnoutEntries length: " + turnoutEntries.length)
+		console.log("turnoutLookupUserName not given: using first table entry;  jmriTurnoutAddress: " + jmriTurnoutAddress + "  jmriTurnoutUserName: " + jmriTurnoutUserName)
+	    } else {
+                // force current loop entry lowercase and remove whitespace for more accurate matching
+                let lowercaseTurnoutLookupUserName = turnoutLookupUserName.toLowerCase() 
+	        console.log("Converted turnoutLookupUserName from: " + turnoutLookupUserName + " to: " + lowercaseTurnoutLookupUserName)
+                let compactedTurnoutLookupUserName = lowercaseTurnoutLookupUserName.replace(/\s+/g, '')
+	        console.log("Converted lowercaseTurnoutLookupUserName from: " + lowercaseTurnoutLookupUserName + " to: " + compactedTurnoutLookupUserName)
+
+		// setup a loop to perform a lookup 
+		turnoutMatchLoop:
+		for (let i = 0; i < turnoutEntries.length; i++) {
+                    // force current loop entry lowercase and remove whitespace for more accurate matching
+                    let lowercaseCurrentTurnoutEntry = turnoutEntries[i].data.userName.toLowerCase() 
+	            console.log("Set lowercaseCurrentTurnoutEntry from: " + turnoutEntries[i].data.userName + " to: " + lowercaseCurrentTurnoutEntry)
+                    let compactedCurrentTurnoutEntry = lowercaseCurrentTurnoutEntry.replace(/\s+/g, '')
+	            console.log("Set compactedCurrentTurnoutEntry from: " + lowercaseCurrentTurnoutEntry + " to: " + compactedCurrentTurnoutEntry)
+                    
+		    // check if the current loop value matches the userName
+		    if (compactedTurnoutLookupUserName != compactedCurrentTurnoutEntry) {
+			lookupErrorReturned = true
+			console.log("No Match, lookupErrorReturned: " + lookupErrorReturned)
+		    } else { 
+			// there is no error matching (match was found), set a special bool for later use to inform the user
+                        // replace any whitespace in userName with %20 so it doesn't break the request URL
+			jmriTurnoutAddress = turnoutEntries[i].data.name
+			jmriTurnoutUserName = turnoutEntries[i].data.userName.replace(/\s+/g, '%20')
+			lookupErrorReturned = false
+			console.log("Turnout Matched;  jmriTurnoutAddress: " + jmriTurnoutAddress + " jmriTurnoutUserName: " + jmriTurnoutUserName + " lookupErrorReturned: " + lookupErrorReturned)
+			break turnoutMatchLoop;
+		    }
+		}
+	    }
+	}
+    })   
+
+    .catch((err) => {
+	//set an optional error message here
+	//outputSpeech = err.message;
+    });
+}
+
 const skillBuilder = Alexa.SkillBuilders.custom();
 
 exports.handler = skillBuilder
   .addRequestHandlers(
     GetRosterDataHandler,
+    GetTurnoutDataHandler,
     GetPowerDataHandler,
     RestPowerIntentHandler,
+    RestTurnoutIntentHandler,
     WebsocketDirectionHandler,
     WebsocketThrottleHandler,
     RoarAudioHandler,
