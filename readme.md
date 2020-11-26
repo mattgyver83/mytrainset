@@ -160,10 +160,10 @@ what trains do i have
 what does my train roster look like  
 what are my train addresses  
 whats in my train roster  
-whats in my roster
+whats in my roster  
 
-#### Turnout Control
-to close the station turn out
-to throw the station turn out
-to close the inner loop turn out
-to throw the inner loop turn out
+#### Turnout Control  
+to close the station turn out  
+to throw the station turn out  
+to close the inner loop turn out  
+to throw the inner loop turn out  
