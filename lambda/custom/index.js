@@ -5,11 +5,12 @@ const Alexa = require('ask-sdk-core');
 const WebSocket = require('ws');
 const moment = require('moment');
 const url = require('url');
+const config = require('./config.json');
 
 
 // modify the url below to that of your JMRI instance
 // do not remove surrounding single quotes and retain ending slash ie:
-const jmriUrl = url.parse('http://your.trainset.com:12080/json/');
+const jmriUrl = url.parse(config.jmriUrl);
 
 // setup global variables based on the url provided for later use
 const jmriProtocol = jmriUrl.protocol.slice(0,-1);
@@ -610,16 +611,20 @@ const putRemoteData = function(host, path, port, json, method, ssl) {
     });
   };
 
-  // determine which method to use based on value of ssl
-  if (typeof ssl === 'undefined') {
-    let http = require('http');
-    // send request via http
-    http.request(options, callback).write(bodyString);
-  } else {
-    let https = require('https');
-    // send request via https
-    https.request(options, callback).write(bodyString);
-  }
+   if (typeof ssl === 'undefined') {
+     let http = require('http');
+   
+     const req = http.request(options, callback);
+     req.on('error', (err) => console.error('JMRI HTTP error:', err));
+     req.end(bodyString);
+   
+   } else {
+     let https = require('https');
+   
+     const req = https.request(options, callback);
+     req.on('error', (err) => console.error('JMRI HTTPS error:', err));
+     req.end(bodyString);
+   }
 
   console.log("ssl state: " + ssl)
 
