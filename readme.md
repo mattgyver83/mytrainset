@@ -4,7 +4,7 @@ This Alexa skill enables you to communicate to your local instance of JMRI using
 
 ## Prerequisites:
 1.  JMRI Web Server with JSON API enabled (WiThrottle is not required by this skill) 
-2.  Access to your Web Throttle over the internet; generally port 12080
+2.  Your JMRI Web Server must be accessible from the internet (typically port 12080)
 
 ## Features
 This skill provides the following features, see usage for example phrases
@@ -30,15 +30,18 @@ The most straight forward way to install this skill is using the Alexa Skills Ki
 Configuration requires the following steps
 
 1.  Enable the JMRI Web server
-3.  Setup a port forward in your router pointing that points to the internal address of the system running JMRI
-4.  Edit `lambda/custom/config.json` and set `jmriUrl` to your externally reachable JMRI JSON endpoint, including `/json/` (an internal-only address will not work from AWS Lambda). Prefer HTTPS with access controls; do not expose an unauthenticated JMRI endpoint directly to the public internet.
+2.  Set up port forwarding on your router to the computer running JMRI.
+3.  Edit `lambda/custom/config.json` and set `jmriUrl` to your externally reachable JMRI JSON endpoint, including `/json/` (an internal-only address will not work from AWS Lambda). Prefer HTTPS with access controls; do not expose an unauthenticated JMRI endpoint directly to the public internet.
 
 ### Deploy the skill
 
     cd </path/to/skill/template/root/>
+    cd lambda/custom
+    npm install
+    cd ../..
     ask deploy
 
-**Dependencies:** This source archive does not include `node_modules`. The ASK CLI deployment environment must install the dependencies declared in `lambda/custom/package.json`, or they must be packaged with the Lambda deployment. The original project’s runtime behavior has not yet been fully regression-tested.
+**Note:** Note: This skill has been updated for modern Alexa and Node.js. Some commands may behave differently depending on your JMRI configuration.
 
 **Upon completion use either the Alexa website or Alexa app to verify your custom skill has been enabled**
 
@@ -52,70 +55,70 @@ Start your request by saying, "Alexa, ask my train set ..."
 set the speed to 100 percent  
 set the throttle to 100 percent  
 set the throttle speed to 100 percent  
-set the speed of 2121 to 100 percent  
-set the throttle speed for 2121 to 100 percent  
-set the throttle of 2121 to 100 percent  
-set the throttle for 2121 to 100 percent  
-set the throttle speed of 2121 to 100 percent  
-set the speed of 2121 to 100   
-set the throttle speed for 2121 to 100   
-set the throttle of 2121 to 100   
-set the throttle for 2121 to 100   
-set the throttle speed of 2121 to 100   
-set the speed of car 2121 to 100 percent  
-set the speed of train 2121 to 100 percent  
-set the speed of locomotive 2121 to 100 percent  
-set the speed of address 2121 to 100 percent  
-set the throttle speed for car 2121 to 100 percent  
-set the throttle speed for train 2121 to 100 percent  
-set the throttle speed for locomotive 2121 to 100 percent  
-set the throttle speed for address 2121 to 100 percent  
-set the throttle of car 2121 to 100 percent  
-set the throttle of train 2121 to 100 percent  
-set the throttle of locomotive 2121 to 100 percent  
-set the throttle of address 2121 to 100 percent  
-set the throttle for car 2121 to 100 percent  
-set the throttle for train 2121 to 100 percent  
-set the throttle for locomotive 2121 to 100 percent  
-set the throttle for address 2121 to 100 percent  
-set the throttle speed of address 2121 to 100 percent  
-set the throttle speed of car 2121 to 100 percent  
-set the throttle speed of train 2121 to 100 percent  
-set the throttle speed of loco 2121 to 100 percent  
-set the train speed of 1212 to fourty percent  
-set the speed of car 2121 to 100   
-set the speed of train 2121 to 100   
-set the speed of locomotive 2121 to 100   
-set the speed of address 2121 to 100   
-set the throttle speed for car 2121 to 100   
-set the throttle speed for train 2121 to 100   
-set the throttle speed for locomotive 2121 to 100   
-set the throttle speed for address 2121 to 100   
-set the throttle of car 2121 to 100   
-set the throttle of train 2121 to 100   
-set the throttle of locomotive 2121 to 100   
-set the throttle of address 2121 to 100   
-set the throttle for car 2121 to 100   
-set the throttle for train 2121 to 100   
-set the throttle for locomotive 2121 to 100   
-set the throttle for address 2121 to 100   
-set the throttle speed of address 2121 to 100   
-set the throttle speed of car 2121 to 100   
-set the throttle speed of train 2121 to 100   
-set the throttle speed of loco 2121 to 100   
-set address 2121's throttle speed to 100   
-set address 2121's throttle to 100   
-set address 2121's speed to 100   
-set address 2121's throttle speed to 100 percent  
-set address 2121's throttle to 100 percent  
-set address 2121's speed to 100 percent  
-set 2121's speed to 100 percent  
-set 2121's throttle speed to 100 percent  
-set 2121's throttle to 100 percent  
+set the speed of 1234 to 100 percent  
+set the throttle speed for 1234 to 100 percent  
+set the throttle of 1234 to 100 percent  
+set the throttle for 1234 to 100 percent  
+set the throttle speed of 1234 to 100 percent  
+set the speed of 1234 to 100   
+set the throttle speed for 1234 to 100   
+set the throttle of 1234 to 100   
+set the throttle for 1234 to 100   
+set the throttle speed of 1234 to 100   
+set the speed of car 1234 to 100 percent  
+set the speed of train 1234 to 100 percent  
+set the speed of locomotive 1234 to 100 percent  
+set the speed of address 1234 to 100 percent  
+set the throttle speed for car 1234 to 100 percent  
+set the throttle speed for train 1234 to 100 percent  
+set the throttle speed for locomotive 1234 to 100 percent  
+set the throttle speed for address 1234 to 100 percent  
+set the throttle of car 1234 to 100 percent  
+set the throttle of train 1234 to 100 percent  
+set the throttle of locomotive 1234 to 100 percent  
+set the throttle of address 1234 to 100 percent  
+set the throttle for car 1234 to 100 percent  
+set the throttle for train 1234 to 100 percent  
+set the throttle for locomotive 1234 to 100 percent  
+set the throttle for address 1234 to 100 percent  
+set the throttle speed of address 1234 to 100 percent  
+set the throttle speed of car 1234 to 100 percent  
+set the throttle speed of train 1234 to 100 percent  
+set the throttle speed of loco 1234 to 100 percent  
+set the train speed of 1234 to fourty percent  
+set the speed of car 1234 to 100   
+set the speed of train 1234 to 100   
+set the speed of locomotive 1234 to 100   
+set the speed of address 1234 to 100   
+set the throttle speed for car 1234 to 100   
+set the throttle speed for train 1234 to 100   
+set the throttle speed for locomotive 1234 to 100   
+set the throttle speed for address 1234 to 100   
+set the throttle of car 1234 to 100   
+set the throttle of train 1234 to 100   
+set the throttle of locomotive 1234 to 100   
+set the throttle of address 1234 to 100   
+set the throttle for car 1234 to 100   
+set the throttle for train 1234 to 100   
+set the throttle for locomotive 1234 to 100   
+set the throttle for address 1234 to 100   
+set the throttle speed of address 1234 to 100   
+set the throttle speed of car 1234 to 100   
+set the throttle speed of train 1234 to 100   
+set the throttle speed of loco 1234 to 100   
+set address 1234's throttle speed to 100   
+set address 1234's throttle to 100   
+set address 1234's speed to 100   
+set address 1234's throttle speed to 100 percent  
+set address 1234's throttle to 100 percent  
+set address 1234's speed to 100 percent  
+set 1234's speed to 100 percent  
+set 1234's throttle speed to 100 percent  
+set 1234's throttle to 100 percent  
   
 #### Directional Control (single and multi-address)  
-to move train 1212 forward  
-to drive train 1212 forward  
+to move train 1234 forward  
+to drive train 1234 forward  
 to move forward  
 to go in reverse  
 move backwards  
@@ -123,18 +126,18 @@ drive forwards
 to go backwards  
 to move the train forward  
 to make the train go forward  
-to move 2121 forward  
-to have train 2121 go in reverse  
-to have train 2121 drive forward  
-to have train 2121 go backwards  
+to move 1234 forward  
+to have train 1234 go in reverse  
+to have train 1234 drive forward  
+to have train 1234 go backwards  
   
 #### Rewind Control (single and multi-address)  
 to rewind 10 seconds  
 to rewind for 10 seconds  
-to rewind 1212 for 10 seconds  
-to rewind car 1212 for 10 seconds  
-to rewind car 1212   
-to rewind 1212   
+to rewind 1234 for 10 seconds  
+to rewind car 1234 for 10 seconds  
+to rewind car 1234   
+to rewind 1234   
   
 #### Power Control  
 turn on the train  
